@@ -1,6 +1,7 @@
 #coding: utf-8
 #created at 16-10-25 17:38
 import os
+import threading
 from Xlib.display import Display
 from Xlib import X
 from Xlib.ext import record
@@ -10,6 +11,8 @@ from use_gtk import create_window
 from PyQt5.QtCore import pyqtSignal, QObject
 from DCtrlSignal import DoubleCtrlSignal
 
+
+
 disp = None
 flag = 0
 
@@ -18,6 +21,8 @@ flag = 0
     # def __init__(self, *args, **kwargs):
     #     super(QObject, self).__init__(*args, **kwargs)
     #     self.
+
+
 
 
 def handler(reply):
@@ -43,12 +48,15 @@ def handler(reply):
                 # print "released"
                 pass
             if event.type == X.KeyPress and flag % 2 == 0:
-                # print flag%2
+                print 'to here'
                 word = os.popen('xsel').read()
                 # create_window.main()
-                print word
-                # print query_dict(words=word)#.encode('utf-8')
-                DoubleCtrlSignal.instance().doublle_ctrl_signal.emit()
+
+
+
+
+            # print query_dict(words=word)#.encode('utf-8')
+                DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word)
             # else:
             #     create_window.main_quit()
 
