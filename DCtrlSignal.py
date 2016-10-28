@@ -4,7 +4,8 @@ from PyQt5.QtCore import pyqtSignal, QObject
 
 
 class DoubleCtrlSignal(QObject):
-    doublle_ctrl_signal = pyqtSignal(str)
+    doublle_ctrl_signal = pyqtSignal(str, int, int)
+    esc_signal = pyqtSignal()
 
     @staticmethod
     def instance():
