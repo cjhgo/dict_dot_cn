@@ -1,8 +1,6 @@
 #coding: utf-8
 #created at 16-10-25 18:03
 import sys
-from time import  sleep
-from PyQt5.QtCore import QUrl
 from PyQt5 import QtCore
 from PyQt5.QtGui import QCursor
 from PyQt5.QtCore import QTimer
@@ -12,7 +10,6 @@ from PyQt5.QtWidgets import  QVBoxLayout, QHBoxLayout, QLabel
 from PyQt5.QtCore import QEvent
 from DCtrlSignal import DoubleCtrlSignal
 from get_rendered_html import MyWebPage
-from dictcn import get_html_by_word
 
 
 class MainWindow(QMainWindow):
@@ -40,27 +37,26 @@ class DictDotCn(QWidget):
         self.webview = QWebView()
         self.layout.addWidget(self.webview)
 
+        # self.text = QLineEdit()# QPlainTextEdit()
+        # self.text.resize(400, 4)
+        # self.text.returnPressed.connect(self.queryword)
+        # self.layout.addWidget(self.text)
+
+
+
+
+        self.layout2 = QHBoxLayout()
+
+        self.layout.addWidget(self.webview)
+        self.layout.addLayout(self.layout2)
+
         self.text =QLineEdit()# QPlainTextEdit()
         self.text.resize(400, 4)
         self.text.returnPressed.connect(self.queryword)
-        self.layout.addWidget(self.text)
+        self.layout2.addWidget(self.text)
 
-        # self.button = QPushButton('+')
-        # self.layout.addWidget(self.button)
-
-
-        # self.layout2 = QHBoxLayout()
-        #
-        # self.layout.addWidget(self.webview)
-        # self.layout.addLayout(self.layout2)
-        #
-        # self.text =QLineEdit()# QPlainTextEdit()
-        # self.text.resize(400, 4)
-        # self.text.returnPressed.connect(self.queryword)
-        # self.layout2.addWidget(self.text)
-        #
-        # self.button = QPushButton('+')
-        # self.layout2.addWidget(self.button)
+        self.button = QPushButton('+')
+        self.layout2.addWidget(self.button)
 
 
         # self.setGeometry(0, 0, 400, 500)
@@ -69,7 +65,11 @@ class DictDotCn(QWidget):
 
     def queryword(self):
         word = self.text.text()
+        # x = self.geometry().x()
+        # y = self.geometry().y()
+        # self.double_ctrl_event(word, x + 100, y + 100)
         self.double_ctrl_event(word, 0, 0)
+
 
     def fadeout(self, opacity):
         if self.fadeflag:
@@ -119,31 +119,35 @@ class DictDotCn(QWidget):
 
     def leaveEvent(self, e):
         """
-        leave from left, right, below hide the window
-        leave from top ,do nothing/not hide so to drag the window
+        leave from left,
+        leave from top,below,right do nothing/not hide so to drag the window
         :param e:
         :return:
         """
         cursor = QCursor()
+        x1 = cursor.pos().x()
         y1 = cursor.pos().y()
+
+        x2 = self.geometry().x()
         y2 = self.geometry().y()
-        if y1 > y2:
+
+        if x1 < x2 and y1 > y2:
             self.hide()
             self.fadeflag = True
+
 
     # def mouseMoveEvent(self, e):
     #     print 'get you youyouy'
     #     self.fadeflag = False
 
-    def eventFilter(self, object, event):
-        if event.type() == QEvent.MouseMove:
-            self.fadeflag = False
-            return False
-        if event.type() == QEvent.HoverLeave:
-            print 'fuckfuck'
-            return False
-        return False
+    # def eventFilter(self, object, event):
+    #     if event.type() == QEvent.MouseMove:
+    #         self.fadeflag = False
+    #         return False
+    #     if event.type() == QEvent.HoverLeave:
+    #         print 'fuckfuck'
+    #         return False
+    #     return False
 app = QApplication(sys.argv)
-# app.installEventFilter()
 
 

@@ -18,12 +18,6 @@ flag = 0
 
 
 
-    # def __init__(self, *args, **kwargs):
-    #     super(QObject, self).__init__(*args, **kwargs)
-    #     self.
-
-
-
 
 def handler(reply):
     global flag

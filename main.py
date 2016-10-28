@@ -4,7 +4,7 @@
 
 import threading
 from global_shortcut import detect_double_ctrl
-from application import app, DictDotCn, MainWindow
+from application import app, DictDotCn
 
 if __name__ == '__main__':
     global_shortcut_detect_loop = threading.Thread(target= detect_double_ctrl)
