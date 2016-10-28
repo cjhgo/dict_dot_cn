@@ -37,20 +37,13 @@ class DictDotCn(QWidget):
         self.webview = QWebView()
         self.layout.addWidget(self.webview)
 
-        # self.text = QLineEdit()# QPlainTextEdit()
-        # self.text.resize(400, 4)
-        # self.text.returnPressed.connect(self.queryword)
-        # self.layout.addWidget(self.text)
-
-
-
 
         self.layout2 = QHBoxLayout()
 
         self.layout.addWidget(self.webview)
         self.layout.addLayout(self.layout2)
 
-        self.text =QLineEdit()# QPlainTextEdit()
+        self.text =QLineEdit()
         self.text.resize(400, 4)
         self.text.returnPressed.connect(self.queryword)
         self.layout2.addWidget(self.text)
