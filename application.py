@@ -80,7 +80,6 @@ class DictDotCn(QWidget):
         :return:
         """
         if self.isHidden() or self.word!= message:
-            print 'get to here', x, y, message
             self.word = message
 
             if x > 0 and y > 0:#come from xsel
