@@ -32,33 +32,19 @@ def handler(reply):
     while len(data):
         event, data = rq.EventField(None).parse_binary_value(data, disp.display, None, None)
 
-        # KEYCODE IS FOUND USERING event.detail
-        # print event.detail
-        if event.detail ==  37:
-            # print event.detail
-
-            # print 'ctrl'
+        if event.detail ==  66:
             if event.type == X.KeyPress:
-                # BUTTON PRESSED
                 flag +=1
-                # print flag
-                # print "pressed"
             elif event.type == X.KeyRelease:
-                # BUTTON RELEASED
-                # print "released"
                 pass
             if event.type == X.KeyPress and flag % 2 == 0:
-                print 'to here'
+
                 word = os.popen('xsel').read()
-                # create_window.main()
-
-
-
-
-            # print query_dict(words=word)#.encode('utf-8')
-                DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word)
-            # else:
-            #     create_window.main_quit()
+                x = event._data['root_x']
+                y = event._data['root_y']
+                DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
+        if event.detail == 9:
+            DoubleCtrlSignal.instance().esc_signal.emit()
 
 
 

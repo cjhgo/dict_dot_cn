@@ -3,86 +3,147 @@
 import sys
 from time import  sleep
 from PyQt5.QtCore import QUrl
+from PyQt5 import QtCore
+from PyQt5.QtGui import QCursor
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWebKitWidgets import QWebView
-from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget
+from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QPlainTextEdit, QLineEdit
+from PyQt5.QtWidgets import  QVBoxLayout, QHBoxLayout, QLabel
+from PyQt5.QtCore import QEvent
 from DCtrlSignal import DoubleCtrlSignal
 from get_rendered_html import MyWebPage
 from dictcn import get_html_by_word
 
 
+class MainWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+        self.dict_widget = DictDotCn(self)
+        self.setWindowTitle('Dict.cn')
+        self.setCentralWidget(self.dict_widget)
+        self.show()
 
-class DictDotCn(QMainWindow):
-    def __init__(self):
-        super(QMainWindow, self).__init__()
-        DoubleCtrlSignal.instance().doublle_ctrl_signal[str].connect(self.double_ctrl_event)
+
+
+
+class DictDotCn(QWidget):
+    def __init__(self, parent=None):
+        super(DictDotCn, self).__init__(parent)
+        DoubleCtrlSignal.instance().doublle_ctrl_signal[str, int, int].connect(self.double_ctrl_event)
+        DoubleCtrlSignal.instance().esc_signal.connect(self.hide)
+        self.fadeflag = True
         self.word = ''
-        self.webview = None
-        self.initUI()
+        self.resize(400, 450)
 
-    def initUI(self):
+        self.layout =  QVBoxLayout(self)
 
-        w = QWidget(self)
+        self.webview = QWebView()
+        self.layout.addWidget(self.webview)
 
-        w.resize(1000, 800)
-        w.move(0, 0)
-        w.setWindowTitle('Dict.cn')
+        self.text =QLineEdit()# QPlainTextEdit()
+        self.text.resize(400, 4)
+        self.text.returnPressed.connect(self.queryword)
+        self.layout.addWidget(self.text)
 
-        self.webview = QWebView(w)
-
-        # view.setUrl(QUrl("http://dict.cn/preliminary"))
-        self.webview.load(QUrl("http://dict.cn/" + self.word))
-        print '______', self.word, '________'
+        # self.button = QPushButton('+')
+        # self.layout.addWidget(self.button)
 
 
-        # qbtn = QPushButton('Quit', self)
-        # qbtn.clicked.connect(self.double_ctrl_event)
-        self.setGeometry(0, 0, 1000, 800)
-        # self.setWindowTitle('Emit signal')
-
-        # self.word = ''
-        # w = QWidget(self)
+        # self.layout2 = QHBoxLayout()
         #
-        # w.resize(500, 500)
-        # w.move(300, 300)
-        # w.setWindowTitle('Dict.cn')
+        # self.layout.addWidget(self.webview)
+        # self.layout.addLayout(self.layout2)
         #
-        # view = QWebView(w)
+        # self.text =QLineEdit()# QPlainTextEdit()
+        # self.text.resize(400, 4)
+        # self.text.returnPressed.connect(self.queryword)
+        # self.layout2.addWidget(self.text)
         #
-        # # view.setUrl(QUrl("http://dict.cn/preliminary"))
-        # view.load(QUrl("http://dict.cn/" + self.word))
-        # view.show()
-        # w.show()
-        self.show()
+        # self.button = QPushButton('+')
+        # self.layout2.addWidget(self.button)
+
+
+        # self.setGeometry(0, 0, 400, 500)
 
 
 
-    def double_ctrl_event(self, message):
-        print message
-        self.word = message
-        # if self.isHidden():
-            # self.show()
-            # self.webview.load(QUrl("http://dict.cn/" + self.word))
-            # content = get_html_by_word(self.word)
-            # self.webview.setHtml(content)
-        self.webpage = MyWebPage("http://dict.cn/" + self.word, self.webview)
-        self.show()
-        QTimer.singleShot(3000, self.hide)
-        # else:
-        #     self.hide()
+    def queryword(self):
+        word = self.text.text()
+        self.double_ctrl_event(word, 0, 0)
 
-    # def show(self):
-    #     self.initUI()
-    #     super(QMainWindow, self).show()
+    def fadeout(self, opacity):
+        if self.fadeflag:
+            opacity -= 0.1
+            if opacity > 0.2 :
+                self.setWindowOpacity(opacity)
+                QTimer.singleShot(80, lambda: self.fadeout(opacity))
+            else:
+                self.hide()
+    def double_ctrl_event(self, message, x, y):
+        """
 
-    def mousePressEvent(self, event):
-        self.c.doublle_ctrl_signal.emit()
+        :param message: word to query
+        :param x,y: position that selectecd a word
+        :return:
+        """
+        if self.isHidden() or self.word!= message:
+            print 'get to here', x, y, message
+            self.word = message
+
+            if x > 0 and y > 0:#come from xsel
+                self.setGeometry(x+30, y+25, 400, 500)
+                self.text.setText(self.word)
+            else:#come from text
+                pass
 
 
-# if __name__ == '__main__':
+            # MyWebPage.instance(self.webview).set_content("http://dict.cn/" + self.word)
+            self.webpage = MyWebPage("http://dict.cn/" + self.word, self.webview)
+            self.setWindowOpacity(1)
+            self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+            self.show()
+            QTimer.singleShot(3000, lambda :self.fadeout(1))
 
+    def keyPressEvent(self, e):
+        if e.key() == QtCore.Qt.Key_Escape:
+            self.hide()
+            self.fadeflag = True
+
+    def enterEvent(self, e):
+        """
+        when cursor enter window, stop the fadeout effect
+        :param e:
+        :return:
+        """
+        self.fadeflag = False
+
+    def leaveEvent(self, e):
+        """
+        leave from left, right, below hide the window
+        leave from top ,do nothing/not hide so to drag the window
+        :param e:
+        :return:
+        """
+        cursor = QCursor()
+        y1 = cursor.pos().y()
+        y2 = self.geometry().y()
+        if y1 > y2:
+            self.hide()
+            self.fadeflag = True
+
+    # def mouseMoveEvent(self, e):
+    #     print 'get you youyouy'
+    #     self.fadeflag = False
+
+    def eventFilter(self, object, event):
+        if event.type() == QEvent.MouseMove:
+            self.fadeflag = False
+            return False
+        if event.type() == QEvent.HoverLeave:
+            print 'fuckfuck'
+            return False
+        return False
 app = QApplication(sys.argv)
+# app.installEventFilter()
 
-# print 5
-# app.exec_()
-    # sys.exit(app.exec_())
+
