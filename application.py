@@ -24,10 +24,11 @@ class MainWindow(QMainWindow):
 
 
 class DictDotCn(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, key_listen_loop=None):
         super(DictDotCn, self).__init__(parent)
         DoubleCtrlSignal.instance().doublle_ctrl_signal[str, int, int].connect(self.double_ctrl_event)
         DoubleCtrlSignal.instance().esc_signal.connect(self.hide)
+        self.key_listen_loop = key_listen_loop
         self.fadeflag = True
         self.word = ''
         self.resize(400, 450)
@@ -62,6 +63,7 @@ class DictDotCn(QWidget):
         # y = self.geometry().y()
         # self.double_ctrl_event(word, x + 100, y + 100)
         self.double_ctrl_event(word, 0, 0)
+        self.fadeflag = True
 
 
     def fadeout(self, opacity):
@@ -95,6 +97,9 @@ class DictDotCn(QWidget):
             self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
             self.show()
             QTimer.singleShot(3000, lambda :self.fadeout(1))
+
+    def closeEvent(self, QCloseEvent):
+        self.key_listen_loop.terminate()
 
     def keyPressEvent(self, e):
         if e.key() == QtCore.Qt.Key_Escape:

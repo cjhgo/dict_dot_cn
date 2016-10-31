@@ -3,14 +3,12 @@
 
 
 import threading
-from global_shortcut import detect_double_ctrl
+from global_shortcut import Detect_Double_Ctrl #detect_double_ctrl
 from application import app, DictDotCn
 
 if __name__ == '__main__':
-    global_shortcut_detect_loop = threading.Thread(target= detect_double_ctrl)
-    global_shortcut_detect_loop.start()
-    ex = DictDotCn()
+    key_event_loop = Detect_Double_Ctrl()
+    ex = DictDotCn(key_listen_loop=key_event_loop)
     # ex = MainWindow()
     # app.installEventFilter(ex)
     app.exec_()
-    global_shortcut_detect_loop.join()
