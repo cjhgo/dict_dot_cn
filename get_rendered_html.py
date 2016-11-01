@@ -11,15 +11,15 @@ from bs4 import BeautifulSoup
 
 
 
-class __MyWebPage(object):
+class MMyWebPage(object):
     @staticmethod
     def instance(webview):
         if not hasattr(MyWebPage, "_instance"):
-            MyWebPage._instance = MyWebPage(webview)
-        return MyWebPage._instance
+            MMyWebPage._instance = MMyWebPage(webview)
+        return MMyWebPage._instance
 
     def __init__(self, webview, *args, **kwargs):
-        super(MyWebPage, self).__init__(*args, **kwargs)
+        super(MMyWebPage, self).__init__(*args, **kwargs)
         self.webview = webview
         self.webpage = QWebPage()
         self.webpage.loadFinished.connect(self.on_loadFinished)

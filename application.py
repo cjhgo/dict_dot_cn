@@ -9,7 +9,8 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QPl
 from PyQt5.QtWidgets import  QVBoxLayout, QHBoxLayout, QLabel
 from PyQt5.QtCore import QEvent
 from DCtrlSignal import DoubleCtrlSignal
-from get_rendered_html import MyWebPage
+# from get_rendered_html import  MMyWebPage#MyWebPage,
+from get_rendered_html import  MyWebPage
 
 
 class MainWindow(QMainWindow):
@@ -91,15 +92,16 @@ class DictDotCn(QWidget):
                 pass
 
 
-            # MyWebPage.instance(self.webview).set_content("http://dict.cn/" + self.word)
+            # MMyWebPage.instance(self.webview).set_content("http://dict.cn/" + self.word)
             self.webpage = MyWebPage("http://dict.cn/" + self.word, self.webview)
             self.setWindowOpacity(1)
             self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
             self.show()
             QTimer.singleShot(3000, lambda :self.fadeout(1))
 
-    def closeEvent(self, QCloseEvent):
+    def closeEvent(self, e):
         self.key_listen_loop.terminate()
+
 
     def keyPressEvent(self, e):
         if e.key() == QtCore.Qt.Key_Escape:
