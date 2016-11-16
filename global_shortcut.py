@@ -45,20 +45,22 @@ class Detect_Double_Ctrl(object):
                 delta = 2
                 if self.first_click == 0.0:
                     self.first_click = time.time()
-                    print 'a', self.first_click,  self.second_click, delta
+                    print '#a', self.first_click,  self.second_click, delta
                 else:
                     self.second_click = time.time()
                     delta = self.second_click - self.first_click
                     self.first_click, self.second_click = 0.0, 0.0
-                    print 'b', self.first_click, self.second_click, delta
+                    print '#b', self.first_click, self.second_click, delta
                 if delta < 1:
                     with os.popen('xsel') as xsel:
                         word = xsel.read()
                         emit = True if re.search(r'[a-zA-z]', word) else False
-                        if emit:#double click emit signal only when there exists words selected
-                            x = event._data['root_x']
-                            y = event._data['root_y']
-                            DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
+                        if emit:
+                            print word
+
+                        x = event._data['root_x']
+                        y = event._data['root_y']
+                        DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
 
             # if event.detail == 66:
             #     if event.type == X.KeyPress:
