@@ -23,16 +23,34 @@ class Detect_Double_Ctrl(object):
         data = reply.data
         while len(data):
             event, data = rq.EventField(None).parse_binary_value(data, self.disp.display, None, None)
-            if event.detail == 1 and event.type == 5:
+            # if event.detail == 1 and event.type == 5:
+            #     delta = 2
+            #     if self.first_click == 0.0:
+            #         self.first_click = time.time()
+            #         print 'a', delta
+            #     else:
+            #         self.second_click = time.time()
+            #         delta = self.second_click - self.first_click
+            #         self.first_click, self.second_click = 0.0, 0.0
+            #         print delta
+            #     if delta < 1:
+            #         with os.popen('xsel') as xsel:
+            #             word = xsel.read()
+            #             emit = True if re.search(r'[a-zA-z]', word) else False
+            #             if emit:#double click emit signal only when there exists words selected
+            #                 x = event._data['root_x']
+            #                 y = event._data['root_y']
+            #                 # DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
+            if event.detail == 66 and event.type == X.KeyPress:
                 delta = 2
                 if self.first_click == 0.0:
                     self.first_click = time.time()
-                    print 'a', delta
+                    print 'a', self.first_click,  self.second_click, delta
                 else:
                     self.second_click = time.time()
                     delta = self.second_click - self.first_click
                     self.first_click, self.second_click = 0.0, 0.0
-                    print delta
+                    print 'b', self.first_click, self.second_click, delta
                 if delta < 1:
                     with os.popen('xsel') as xsel:
                         word = xsel.read()
@@ -40,21 +58,21 @@ class Detect_Double_Ctrl(object):
                         if emit:#double click emit signal only when there exists words selected
                             x = event._data['root_x']
                             y = event._data['root_y']
-                            # DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
+                            DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
 
-            if event.detail == 66:
-                if event.type == X.KeyPress:
-                    self.flag +=1
-                elif event.type == X.KeyRelease:
-                    pass
-                if event.type == X.KeyPress and self.flag % 2 == 0:
-                    temp = os.popen('xsel')
-                    word = temp.read()
-                    temp.close()
-                    # double capslock emit signal even though there no words selected to show the window
-                    x = event._data['root_x']
-                    y = event._data['root_y']
-                    DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
+            # if event.detail == 66:
+            #     if event.type == X.KeyPress:
+            #         self.flag +=1
+            #     elif event.type == X.KeyRelease:
+            #         pass
+            #     if event.type == X.KeyPress and self.flag % 2 == 0:
+            #         temp = os.popen('xsel')
+            #         word = temp.read()
+            #         temp.close()
+            #         # double capslock emit signal even though there no words selected to show the window
+            #         x = event._data['root_x']
+            #         y = event._data['root_y']
+            #         DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
 
             if event.detail == 9:
                 DoubleCtrlSignal.instance().esc_signal.emit()
