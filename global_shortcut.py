@@ -40,7 +40,7 @@ class Detect_Double_Ctrl(object):
                         if emit:#double click emit signal only when there exists words selected
                             x = event._data['root_x']
                             y = event._data['root_y']
-                            DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
+                            # DoubleCtrlSignal.instance().doublle_ctrl_signal.emit(word, x, y)
 
             if event.detail == 66:
                 if event.type == X.KeyPress:

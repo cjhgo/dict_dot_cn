@@ -93,10 +93,10 @@ class DictDotCn(QWidget):
 
 
             # MMyWebPage.instance(self.webview).set_content("http://dict.cn/" + self.word)
-            self.webpage = MyWebPage("http://dict.cn/" + self.word, self.webview)
+            self.webpage = MyWebPage("http://dict.cn/" + self.word, self)
             self.setWindowOpacity(1)
             self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-            self.show()
+            # self.show()
             QTimer.singleShot(3000, lambda :self.fadeout(1))
 
     def closeEvent(self, e):

@@ -63,14 +63,14 @@ class MyWebPage(QWebPage):
     #         MyWebPage._instance = MyWebPage()
     #     return MyWebPage._instance
 
-    def __init__(self, url, webview, *args, **kwargs):
+    def __init__(self, url, widget, *args, **kwargs):
         super(MyWebPage, self).__init__(*args, **kwargs)
         self.content = ''
         self.result = False
         self.qurl = QUrl(url)
         self.loadFinished.connect(self.on_loadFinished)
         self.mainFrame().load(self.qurl)
-        self.webview = webview
+        self.widget = widget
 
     def on_loadFinished(self, result):
         self.result = result
@@ -87,7 +87,9 @@ class MyWebPage(QWebPage):
             except:
                 pass
             finally:
-                self.webview.setHtml(str(temp))
+                if str(temp):
+                    self.widget.webview.setHtml(str(temp))
+                    self.widget.show()
             # with open('temp.html', 'w') as f:
             #     f.write(str(temp))
     @property
