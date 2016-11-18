@@ -4,7 +4,7 @@
 
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWebKitWidgets import QWebView, QWebPage
-
+from PyQt5.QtCore import QTimer
 from bs4 import BeautifulSoup
 
 
@@ -89,7 +89,10 @@ class MyWebPage(QWebPage):
             finally:
                 if str(temp):
                     self.widget.webview.setHtml(str(temp))
-                    self.widget.show()
+                    if self.widget.windowOpacity() == 1:
+                        self.widget.show()
+                        self.widget.setWindowOpacity(0.98)
+                        QTimer.singleShot(3000, lambda: self.widget.fadeout(1))
             # with open('temp.html', 'w') as f:
             #     f.write(str(temp))
     @property

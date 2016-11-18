@@ -1,16 +1,21 @@
 #coding: utf-8
 #created at 16-10-25 18:03
 import sys
+import logging
 from PyQt5 import QtCore
 from PyQt5.QtGui import QCursor
 from PyQt5.QtCore import QTimer
+
+
 from PyQt5.QtWebKitWidgets import QWebView
 from PyQt5.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QPlainTextEdit, QLineEdit
 from PyQt5.QtWidgets import  QVBoxLayout, QHBoxLayout, QLabel
 from PyQt5.QtCore import QEvent
 from DCtrlSignal import DoubleCtrlSignal
 # from get_rendered_html import  MMyWebPage#MyWebPage,
-from get_rendered_html import  MyWebPage
+from get_rendered_html import MyWebPage
+
+
 
 
 class MainWindow(QMainWindow):
@@ -29,6 +34,7 @@ class DictDotCn(QWidget):
         super(DictDotCn, self).__init__(parent)
         DoubleCtrlSignal.instance().doublle_ctrl_signal[str, int, int].connect(self.double_ctrl_event)
         DoubleCtrlSignal.instance().esc_signal.connect(self.hide)
+        DoubleCtrlSignal.instance().show_signal.connect(self.center_show)
         self.key_listen_loop = key_listen_loop
         self.fadeflag = True
         self.word = ''
@@ -56,7 +62,16 @@ class DictDotCn(QWidget):
 
         # self.setGeometry(0, 0, 400, 500)
 
-
+    def center_show(self):
+        frameGm = self.frameGeometry()
+        screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+        centerPoint = QApplication.desktop().screenGeometry(screen).center()
+        frameGm.moveCenter(centerPoint)
+        self.move(frameGm.topLeft())
+        self.setWindowOpacity(1)
+        self.show()
+        self.setFocus()
+        self.text.setFocus()
 
     def queryword(self):
         word = self.text.text()
@@ -93,11 +108,12 @@ class DictDotCn(QWidget):
 
 
             # MMyWebPage.instance(self.webview).set_content("http://dict.cn/" + self.word)
+            logging.info(self.word)
             self.webpage = MyWebPage("http://dict.cn/" + self.word, self)
             self.setWindowOpacity(1)
             self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
             # self.show()
-            QTimer.singleShot(3000, lambda :self.fadeout(1))
+            # QTimer.singleShot(3000, lambda :self.fadeout(1))
 
     def closeEvent(self, e):
         self.key_listen_loop.terminate()
