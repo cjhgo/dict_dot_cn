@@ -1,5 +1,6 @@
 #coding: utf-8
 
+import os
 import sys
 import logging
 from time import strftime
@@ -22,7 +23,7 @@ from PyQt5.QtWidgets import  QVBoxLayout, QHBoxLayout, QLabel
 from PyQt5.QtCore import QEvent
 
 
-
+BASE=60
 
 
 class PauseableTimer(QTimer):
@@ -42,7 +43,7 @@ class PauseableTimer(QTimer):
     return td_str
 
   def setCount(self, cnt):    
-    PauseableTimer.DUR = cnt*60
+    PauseableTimer.DUR = cnt*BASE
     self.counter = PauseableTimer.DUR
     self.target.display(self.cur())
 
@@ -77,15 +78,15 @@ class PauseableTimer(QTimer):
     logging.critical("Good, task"+ self.task.text()+" duratioe due")
     self.stop_()
     self.onBreak=True
-    self.counter=5
+    self.counter=5*60
     self.start_()
-    
+    os.system("notify-send  task-done  -i /usr/lib/firefox/browser/icons/mozicon128.png -u critical")    
   
   def onBreakDue(self):  
     logging.info("Okay, it is time to work!")
+    os.system("notify-send  -t 0 go-to-work -u critical")    
     self.onBreak=False
     self.stop_()
-
 
 
 
@@ -102,6 +103,7 @@ class Pomodoro(QMainWindow):
     self.taskDur.setText("40")
 
     self.task = QLineEdit(self)
+    self.task.setText("task")
 
     self.lcd = QLCDNumber(self)
     self.lcd.display("00:00")    
@@ -113,6 +115,10 @@ class Pomodoro(QMainWindow):
     self.start.setText("start")
     self.start.released.connect(self.pat.start_)
 
+    self.pause = QPushButton(self)
+    self.pause.setText("pause")
+    self.pause.released.connect(self.pat.pause)
+
     self.stop = QPushButton(self)
     self.stop.setText("stop")
     self.stop.released.connect(self.pat.stop_)
@@ -122,14 +128,14 @@ class Pomodoro(QMainWindow):
     self.setTL.released.connect(lambda: self.pat.setCount(int(self.taskDur.text())))
     
   
-    self.pause = QPushButton(self)
-    self.pause.setText("pause")
-    self.pause.released.connect(self.pat.pause)
-
+    self.log = QLineEdit(self)
+    self.append = QPushButton(self)
+    self.append.setText("append")
+    self.append.released.connect(lambda: logging.critical("------"+self.log.text()))
     
     self.control.addWidget(self.taskDur,0,0,Qt.AlignLeft)
   
-    self.control.addWidget(self.task,0,1,1,3)
+    self.control.addWidget(self.task,0,1,1,3)//从0,1位置开始,跨1行,跨3列
 
     self.control.addWidget(self.lcd,1,0,1,4)
 
@@ -137,6 +143,8 @@ class Pomodoro(QMainWindow):
     self.control.addWidget(self.pause,2,1)
     self.control.addWidget(self.stop,2,2)
     self.control.addWidget(self.setTL,2,3)
+    self.control.addWidget(self.log, 3,0,1,3)
+    self.control.addWidget(self.append,3,3)
 
     self.content.setLayout(self.control)
 
@@ -148,7 +156,6 @@ class Pomodoro(QMainWindow):
 if __name__ == "__main__":
   logging.basicConfig(filename='/var/log/pomodoro.log', level=logging.INFO,
                     format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M')
-  
   app = QApplication(sys.argv)
   tomato = Pomodoro()
   sys.exit(app.exec_())
