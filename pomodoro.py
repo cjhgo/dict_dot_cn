@@ -29,11 +29,12 @@ BASE=60
 class PauseableTimer(QTimer):
   COUNT = 0 
   DUR = 2400
-  def __init__(self, target,task):
+  def __init__(self, target,task,indicator):
     QTimer.__init__(self,target)    
     self.timeout.connect(self.onTimeout)
     self.target = target
     self.task = task
+    self.indicator=indicator
     self.onBreak = False
     self.counter = PauseableTimer.DUR
 
@@ -46,6 +47,7 @@ class PauseableTimer(QTimer):
     PauseableTimer.DUR = cnt*BASE
     self.counter = PauseableTimer.DUR
     self.target.display(self.cur())
+    self.indicator.display(self.cur())
 
   #start or restart timer
   def start_(self):
@@ -62,9 +64,11 @@ class PauseableTimer(QTimer):
     self.counter = PauseableTimer.DUR
     self.stop()
     self.target.display("00:00")
+    self.indicator.display("00:00")
 
   def onTimeout(self):
     self.target.display(self.cur())
+    self.indicator.display(self.cur())
     self.counter -= 1
     if self.counter < 0:
       if self.onBreak:
@@ -109,7 +113,10 @@ class Pomodoro(QMainWindow):
     self.lcd.display("00:00")    
     self.lcd.setMinimumSize(400,400)
 
-    self.pat = PauseableTimer(self.lcd,self.task)
+    self.indicator = QLCDNumber()
+    self.indicator.display("00:00")        
+    self.indicator.setMinimumSize(75,55)
+    self.pat = PauseableTimer(self.lcd,self.task,self.indicator)
   
     self.start = QPushButton(self)
     self.start.setText("start")
@@ -135,7 +142,7 @@ class Pomodoro(QMainWindow):
     
     self.control.addWidget(self.taskDur,0,0,Qt.AlignLeft)
   
-    self.control.addWidget(self.task,0,1,1,3)//从0,1位置开始,跨1行,跨3列
+    self.control.addWidget(self.task,0,1,1,3)#从0,1位置开始,跨1行,跨3列
 
     self.control.addWidget(self.lcd,1,0,1,4)
 
@@ -149,8 +156,15 @@ class Pomodoro(QMainWindow):
     self.content.setLayout(self.control)
 
     self.content.resize(400,600)
-    self.setCentralWidget(self.content)
+    self.setCentralWidget(self.content)    
     self.show()
+    frameGm = self.indicator.frameGeometry()
+    screen = QApplication.desktop().screenNumber(QApplication.desktop().cursor().pos())
+    bottomRight = QApplication.desktop().screenGeometry(screen).bottomRight()
+    frameGm.moveCenter(bottomRight)
+    self.indicator.move(frameGm.bottomRight())
+    self.indicator.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+    self.indicator.show()
 
 
 if __name__ == "__main__":
